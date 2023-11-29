@@ -45,6 +45,19 @@ const getSingleGame = (id) => new Promise((resolve, reject) => {
     .catch(reject);
 });
 
+const deleteGame = (id) => new Promise((resolve, reject) => {
+  fetch(`${clientCredentials.databaseURL}/games/${id}`, {
+    method: 'DELETE',
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      resolve();
+    })
+    .catch(reject);
+});
+
 const getGameTypes = () => new Promise((resolve, reject) => {
   fetch(`${clientCredentials.databaseURL}/gametypes`)
     .then((response) => response.json())
@@ -58,5 +71,6 @@ export {
   createGame,
   updateGame,
   getSingleGame,
+  deleteGame,
   getGameTypes,
 };
