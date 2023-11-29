@@ -2,9 +2,16 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Card, Button } from 'react-bootstrap';
 import { useRouter } from 'next/router';
+import { deleteGame } from '../utils/data/gameData';
 
-export default function GameCard({ gameObj }) {
+export default function GameCard({ gameObj, onUpdate }) {
   const router = useRouter();
+
+  const deleteThisGame = () => {
+    if (window.confirm('Delete this game?')) {
+      deleteGame(gameObj.id).then(() => onUpdate());
+    }
+  };
 
   return (
     <>
@@ -21,6 +28,10 @@ export default function GameCard({ gameObj }) {
           }}
         >Edit
         </Button>
+        <Button
+          onClick={deleteThisGame}
+        >Delete
+        </Button>
       </Card>;
     </>
   );
@@ -34,4 +45,5 @@ GameCard.propTypes = {
     number_of_players: PropTypes.number.isRequired,
     skill_level: PropTypes.number.isRequired,
   }).isRequired,
+  onUpdate: PropTypes.func.isRequired,
 };

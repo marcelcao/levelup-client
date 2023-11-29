@@ -8,8 +8,12 @@ function Home() {
   const [games, setGames] = useState([]);
   const router = useRouter();
 
-  useEffect(() => {
+  const getAllGames = () => {
     getGames().then((data) => setGames(data));
+  };
+
+  useEffect(() => {
+    getAllGames();
   }, []);
 
   return (
@@ -24,7 +28,7 @@ function Home() {
       <h1>Games</h1>
       {games.map((game) => (
         <section key={`game--${game.id}`} className="game">
-          <GameCard gameObj={game} />
+          <GameCard gameObj={game} onUpdate={getAllGames} />
         </section>
       ))}
     </article>

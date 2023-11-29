@@ -45,10 +45,24 @@ const getSingleEvent = (id) => new Promise((resolve, reject) => {
     .catch(reject);
 });
 
+const deleteEvent = (id) => new Promise((resolve, reject) => {
+  fetch(`${clientCredentials.databaseURL}/events/${id}`, {
+    method: 'DELETE',
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      resolve();
+    })
+    .catch(reject);
+});
+
 // eslint-disable-next-line import/prefer-default-export
 export {
   getEvents,
   createEvent,
   updateEvent,
   getSingleEvent,
+  deleteEvent,
 };
