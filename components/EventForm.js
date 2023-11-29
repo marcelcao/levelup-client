@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { getGames } from '../utils/data/gameData';
-import { createEvent } from '../utils/data/eventData';
+import { createEvent, updateEvent } from '../utils/data/eventData';
+import { useAuth } from '../utils/context/authContext';
 
 const initialState = {
   description: '',
@@ -13,14 +14,26 @@ const initialState = {
   userId: '',
 };
 
-const EventForm = ({ user }) => {
+const EventForm = ({ eventObj }) => {
   const [game, setGame] = useState([]);
   const [currentEvent, setCurrentEvent] = useState(initialState);
   const router = useRouter();
+  const { user } = useAuth();
 
   useEffect(() => {
     getGames().then(setGame);
-  }, [user]);
+
+    if (eventObj.id) {
+      setCurrentEvent({
+        id: eventObj.id,
+        description: eventObj.description,
+        date: eventObj.date,
+        time: eventObj.time,
+        game: eventObj.game?.id,
+        organizer: user.uid,
+      });
+    }
+  }, [eventObj, user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,15 +47,26 @@ const EventForm = ({ user }) => {
     // Prevent form from being submitted
     e.preventDefault();
 
-    const event = {
-      description: currentEvent.description,
-      date: currentEvent.date,
-      time: currentEvent.time,
-      game: Number(currentEvent.gameId),
-      organizer: user.uid,
-    };
-
-    createEvent(event, user.uid).then(() => router.push('/events'));
+    if (eventObj.id) {
+      const update = {
+        id: eventObj.id,
+        description: currentEvent.description,
+        date: currentEvent.date,
+        time: currentEvent.time,
+        game: Number(currentEvent.gameId),
+        organizer: user.uid,
+      };
+      updateEvent(update, user.uid).then(() => router.push(`/events/${eventObj.id}`));
+    } else {
+      const event = {
+        description: currentEvent.description,
+        date: currentEvent.date,
+        time: currentEvent.time,
+        game: Number(currentEvent.gameId),
+        organizer: user.uid,
+      };
+      createEvent(event, user.uid).then(() => router.push('/events'));
+    }
   };
 
   return (
@@ -54,7 +78,7 @@ const EventForm = ({ user }) => {
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Event Date</Form.Label>
-          <Form.Control name="date" placeholder="ex. 11-27-2023" required value={currentEvent.date} onChange={handleChange} />
+          <Form.Control name="date" placeholder="ex. 2023-11-17" required value={currentEvent.date} onChange={handleChange} />
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Event Time</Form.Label>
@@ -77,18 +101,27 @@ const EventForm = ({ user }) => {
               ))}
           </Form.Select>
         </Form.Group>
-        <Button variant="primary" type="submit">
-          Submit
-        </Button>
+        <Button variant="primary" type="submit"> {eventObj.id ? 'Update' : 'Create'} Event </Button>
       </Form>
     </>
   );
 };
 
 EventForm.propTypes = {
-  user: PropTypes.shape({
-    uid: PropTypes.string.isRequired,
-  }).isRequired,
+  eventObj: PropTypes.shape({
+    id: PropTypes.number,
+    description: PropTypes.string,
+    date: PropTypes.string,
+    time: PropTypes.string,
+    game: PropTypes.shape({
+      id: PropTypes.number,
+      title: PropTypes.string,
+    }),
+  }),
+};
+
+EventForm.defaultProps = {
+  eventObj: initialState,
 };
 
 export default EventForm;

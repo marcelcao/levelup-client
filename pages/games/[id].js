@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { getSingleGame } from '../../utils/data/gameData';
 
-function Home() {
+function SingleGame() {
   const [singleGame, setSingleGame] = useState({});
   const router = useRouter();
 
@@ -23,4 +23,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default SingleGame;
