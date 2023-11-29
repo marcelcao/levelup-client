@@ -2,7 +2,8 @@ import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { createGame, getGameTypes } from '../utils/data/gameData';
+import { createGame, getGameTypes, updateGame } from '../utils/data/gameData';
+import { useAuth } from '../utils/context/authContext';
 
 const initialState = {
   skillLevel: 1,
@@ -12,19 +13,27 @@ const initialState = {
   gameTypeId: 0,
 };
 
-const GameForm = ({ user }) => {
+const GameForm = ({ gameObj }) => {
   const [gameTypes, setGameTypes] = useState([]);
-  /*
-  Since the input fields are bound to the values of
-  the properties of this state variable, you need to
-  provide some default values.
-  */
   const [currentGame, setCurrentGame] = useState(initialState);
   const router = useRouter();
+  const { user } = useAuth();
 
   useEffect(() => {
     getGameTypes().then(setGameTypes);
-  }, [user]);
+
+    if (gameObj.id) {
+      setCurrentGame({
+        id: gameObj.id,
+        maker: gameObj.maker,
+        title: gameObj.title,
+        numberOfPlayers: gameObj.number_of_players,
+        skillLevel: gameObj.skill_level,
+        gameType: gameObj.game_type?.id,
+        userId: user.uid,
+      });
+    }
+  }, [gameObj, user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,17 +47,28 @@ const GameForm = ({ user }) => {
     // Prevent form from being submitted
     e.preventDefault();
 
-    const game = {
-      maker: currentGame.maker,
-      title: currentGame.title,
-      numberOfPlayers: Number(currentGame.numberOfPlayers),
-      skillLevel: Number(currentGame.skillLevel),
-      gameType: Number(currentGame.gameTypeId),
-      userId: user.uid,
-    };
-
-    // Send POST request to your API
-    createGame(game, user.uid).then(() => router.push('/games'));
+    if (gameObj.id) {
+      const update = {
+        id: gameObj.id,
+        maker: currentGame.maker,
+        title: currentGame.title,
+        numberOfPlayers: Number(currentGame.numberOfPlayers),
+        skillLevel: Number(currentGame.skillLevel),
+        gameType: Number(currentGame.gameType),
+        userId: user.uid,
+      };
+      updateGame(update, user.uid).then(() => router.push(`/games/${gameObj.id}`));
+    } else {
+      const game = {
+        maker: currentGame.maker,
+        title: currentGame.title,
+        numberOfPlayers: Number(currentGame.numberOfPlayers),
+        skillLevel: Number(currentGame.skillLevel),
+        gameType: Number(currentGame.gameTypeId),
+        userId: user.uid,
+      };
+      createGame(game, user.uid).then(() => router.push('/games'));
+    }
   };
 
   return (
@@ -87,18 +107,28 @@ const GameForm = ({ user }) => {
               ))}
           </Form.Select>
         </Form.Group>
-        <Button variant="primary" type="submit">
-          Submit
-        </Button>
+        <Button variant="primary" type="submit"> {gameObj.id ? 'Update' : 'Create'} Game </Button>
       </Form>
     </>
   );
 };
 
 GameForm.propTypes = {
-  user: PropTypes.shape({
-    uid: PropTypes.string.isRequired,
-  }).isRequired,
+  gameObj: PropTypes.shape({
+    id: PropTypes.number,
+    number_of_players: PropTypes.number,
+    skill_level: PropTypes.number,
+    maker: PropTypes.string,
+    title: PropTypes.string,
+    game_type: PropTypes.shape({
+      id: PropTypes.number,
+      label: PropTypes.string,
+    }),
+  }),
+};
+
+GameForm.defaultProps = {
+  gameObj: initialState,
 };
 
 export default GameForm;
