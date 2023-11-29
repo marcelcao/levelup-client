@@ -25,5 +25,30 @@ const createEvent = (event) => new Promise((resolve, reject) => {
     });
 });
 
+const updateEvent = (payload, uid) => new Promise((resolve, reject) => {
+  fetch(`${clientCredentials.databaseURL}/events/${payload.id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `${uid}`,
+    },
+    body: JSON.stringify(payload),
+  })
+    .then(resolve)
+    .catch(reject);
+});
+
+const getSingleEvent = (id) => new Promise((resolve, reject) => {
+  fetch(`${clientCredentials.databaseURL}/events/${id}`)
+    .then((response) => response.json())
+    .then(resolve)
+    .catch(reject);
+});
+
 // eslint-disable-next-line import/prefer-default-export
-export { getEvents, createEvent };
+export {
+  getEvents,
+  createEvent,
+  updateEvent,
+  getSingleEvent,
+};
