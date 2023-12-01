@@ -3,13 +3,15 @@ import { useRouter } from 'next/router';
 import { Button } from 'react-bootstrap';
 import EventCard from '../../components/EventCard';
 import { getEvents } from '../../utils/data/eventData';
+import { useAuth } from '../../utils/context/authContext';
 
 function Home() {
   const [events, setEvents] = useState([]);
   const router = useRouter();
+  const { user } = useAuth();
 
   const getAllEvents = () => {
-    getEvents().then((data) => setEvents(data));
+    getEvents(user.uid).then((data) => setEvents(data));
   };
 
   useEffect(() => {
@@ -27,7 +29,7 @@ function Home() {
       <h1>List of Events</h1>
       {events.map((event) => (
         <section key={`event--${event.id}`} className="event">
-          <EventCard eventObj={event} onUpdate={getAllEvents} />
+          <EventCard eventObj={event} onUpdate={getAllEvents} joined={event.joined} />
         </section>
       ))}
     </article>
