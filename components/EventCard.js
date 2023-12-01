@@ -7,7 +7,7 @@ import { useAuth } from '../utils/context/authContext';
 
 export default function EventCard({ eventObj, onUpdate }) {
   const router = useRouter();
-  const user = useAuth();
+  const { user } = useAuth();
 
   const deleteThisEvent = () => {
     if (window.confirm('Delete this game?')) {
