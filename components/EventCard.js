@@ -42,11 +42,18 @@ export default function EventCard({ eventObj, onUpdate }) {
           onClick={deleteThisEvent}
         >Delete
         </Button>
-        {
-          eventObj.joined
-            ? <Button onClick={leave}>Leave</Button>
-            : <Button onClick={join}>Join</Button>
-        }
+        {eventObj.joined ? (
+          <Button
+            onClick={leave}
+          >Leave
+          </Button>
+        )
+          : (
+            <Button
+              onClick={join}
+            >Join
+            </Button>
+          )}
       </Card>
     </>
   );

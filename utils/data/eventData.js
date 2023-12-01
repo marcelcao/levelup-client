@@ -91,14 +91,8 @@ const joinEvent = (id, uid) => new Promise((resolve, reject) => {
     },
     body: JSON.stringify({ userId: uid }),
   })
-    .then((response) => response.json())
-    .then((data) => {
-      resolve(data);
-    })
-    .catch((error) => {
-      console.error('Create Game Error:', error);
-      reject(error);
-    });
+    .then((response) => resolve(response.json()))
+    .catch(reject);
 });
 
 // eslint-disable-next-line import/prefer-default-export
