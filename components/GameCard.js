@@ -20,6 +20,7 @@ export default function GameCard({ gameObj, onUpdate }) {
         <Card.Body>
           <Card.Title>By: {gameObj.maker}</Card.Title>
           <Card.Text>{gameObj.number_of_players} players needed</Card.Text>
+          <Card.Text>This game is in {gameObj.event_count} event(s)</Card.Text>
         </Card.Body>
         <Card.Footer className="text-muted">Skill Level: {gameObj.skill_level}</Card.Footer>
         <Button
@@ -44,6 +45,7 @@ GameCard.propTypes = {
     maker: PropTypes.string.isRequired,
     number_of_players: PropTypes.number.isRequired,
     skill_level: PropTypes.number.isRequired,
+    event_count: PropTypes.number.isRequired,
   }).isRequired,
   onUpdate: PropTypes.func.isRequired,
 };
